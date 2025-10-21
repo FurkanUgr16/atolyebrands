@@ -43,7 +43,7 @@ export async function updateSession(request: NextRequest) {
     .eq("user_id", user.id)
     .single()
 
-    const userRole = profile?.role()
+    const userRole = profile?.role;
 
     if(user && pathname === "/"){
         if (userRole === "admin") {

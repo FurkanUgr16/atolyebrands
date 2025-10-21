@@ -7,7 +7,7 @@ const LoginSchema = z.object({
     password: z.string().min(6, {message: "Şifre 6 karakterden oluşmalıdır"})
 })
 
-export async function login( formData:FormData){
+export async function login(formData:FormData){
 
     const validation = LoginSchema.safeParse(
         Object.fromEntries(formData.entries())
@@ -16,7 +16,7 @@ export async function login( formData:FormData){
     if(!validation.success){
         return{
             error: "Lütfen formdaki hataları düzeltin",
-            fieldsError:  z.treeifyError(validation.error)
+            fieldsError: z.treeifyError(validation.error)
         }
     }
 

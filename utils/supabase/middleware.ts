@@ -2,9 +2,14 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function updateSession(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({
+   let supabaseResponse = NextResponse.next({
     request,
   })
+
+  console.log("---");
+  console.log("Middleware Path:", request.nextUrl.pathname);
+  console.log("Supabase URL Loaded:", process.env.NEXT_PUBLIC_SUPABASE_URL ? "Yes" : "NO");
+
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -15,7 +20,7 @@ export async function updateSession(request: NextRequest) {
           return request.cookies.getAll()
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
           supabaseResponse = NextResponse.next({
             request,
           })
@@ -32,9 +37,10 @@ export async function updateSession(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
-  if (!user && pathname.startsWith("/admin") || pathname.startsWith("/dealer")) {
+  if (!user && (pathname.startsWith("/admin") || pathname.startsWith("/dealer"))) {
     return NextResponse.redirect(new URL("/", request.url))
   }
+
 
   if(user){
     const { data: profile } = await supabase
@@ -44,8 +50,9 @@ export async function updateSession(request: NextRequest) {
     .single()
 
     const userRole = profile?.role;
+     console.log("Middleware User Role:", userRole); 
 
-    if(user && pathname === "/"){
+    if(pathname === "/"){
         if (userRole === "admin") {
            return NextResponse.redirect(new URL("/admin", request.url)) 
         }
@@ -55,11 +62,12 @@ export async function updateSession(request: NextRequest) {
     }
 
     if (pathname.startsWith("/admin") && userRole !== "admin") {
-        return NextResponse.redirect(new URL("/", request.url))
+      return NextResponse.redirect(new URL("/", request.url)) 
     }
 
-    if(pathname.startsWith("/dealer") && userRole !== "dealer")
-        return NextResponse.redirect(new URL("/", request.url   ))
-  }
-  return supabaseResponse
+     if (pathname.startsWith("/dealer") && userRole !== "dealer") {
+      return NextResponse.redirect(new URL("/", request.url)) 
+    }
 }
+  return supabaseResponse
+} 

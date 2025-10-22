@@ -1,8 +1,12 @@
 import React from 'react'
+import SignOutButton from '@/components/SignOutButton'
 
 const AdminPage = () => {
   return (
-    <div>AdminPage</div>
+    <>
+      <h1>Admin Page</h1>
+      <SignOutButton />
+    </>
   )
 }
 
